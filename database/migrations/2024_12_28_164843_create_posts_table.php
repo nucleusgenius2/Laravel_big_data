@@ -11,17 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-		Schema::create('posts', function (Blueprint $table) {
-			$table->id();
-			$table->string('name');
-			$table->text('short_description');
-			$table->longText('full_description');
-			$table->unsignedBigInteger('category_id');
-			$table->unsignedBigInteger('author_id');
-			$table->unsignedInteger('views');
-			$table->unsignedTinyInteger('rating');
-			$table->timestamp('created_at');
-		});
+        Schema::create('posts', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->text('short_description');
+            $table->longText('full_description');
+            $table->unsignedBigInteger('category_id');
+            $table->unsignedBigInteger('author_id');
+            $table->unsignedInteger('views');
+            $table->unsignedTinyInteger('rating');
+            $table->timestamp('created_at');
+        });
+    }
 
     /**
      * Reverse the migrations.
