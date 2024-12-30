@@ -8,6 +8,7 @@ use App\Traits\StructuredResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class PostController
@@ -35,7 +36,12 @@ class PostController
                 $postList = $query->orderBy('id', 'desc')->paginate(10, ['*'], 'page', $data['page']);
             }
             else{
-                return Post::orderBy('id', 'desc')->paginate(10, ['*'], 'page', $data['page']);
+                //$postList = Post::orderBy('id', 'desc')->paginate(10, ['*'], 'page', $data['page']);
+
+                log::info( json_encode( count(Post::select('id')->get()) ));
+
+                $offset = ($data['page'] - 1) * 10;
+                $postList = Post::orderBy('id', 'desc')->skip($offset)->take(10)->get();
             }
 
             $this->code = 200;

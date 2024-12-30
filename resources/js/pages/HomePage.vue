@@ -67,7 +67,6 @@
             <div class="post-el" v-for="(post) in arrayPosts">
                 <div class="heading-post">{{ post.name }}</div>
                 <div class="wrap-section-post">
-                    <div class="thumb-post"><img :src="post.img" alt="new-thumb"></div>
                     <div class="post-short-text">
                         <div class="content-short-post">{{ post.short_description }}</div>
                     </div>
@@ -130,8 +129,8 @@ async function paginationListing(filterClick = '') {
 
     if (response.data.status === 'success') {
         emptyPage.value = false;
-        arrayPosts.value = response.data.json.data;
-        pageTotal.value = response.data.json.last_page * 10;
+        arrayPosts.value = response.data.json;
+       // pageTotal.value = response.data.json.last_page * 10;
     }
     else{
         arrayPosts.value = []
@@ -189,7 +188,6 @@ function clearFilter (){
 .content-short-post {
     max-width: 400px;
     margin: 10px 0;
-    padding-left: 20px;
 }
 
 .heading-post {
