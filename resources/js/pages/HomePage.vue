@@ -76,10 +76,9 @@
 
         </div>
 
-        <pagination v-model="pageModel" :records="pageTotal" :per-page="10" @paginate="paginationListing"/>
+        <pagination v-model="pageModel" :records="pageTotal" :per-page="1" @paginate="paginationListing"/>
 
         <div class="empty-list" v-if="emptyPage">По вашему запросу не найдено новостей</div>
-
     </div>
 </template>
 
@@ -130,7 +129,7 @@ async function paginationListing(filterClick = '') {
     if (response.data.status === 'success') {
         emptyPage.value = false;
         arrayPosts.value = response.data.json;
-       // pageTotal.value = response.data.json.last_page * 10;
+        pageTotal.value = response.data.json[1]['data_count'];
     }
     else{
         arrayPosts.value = []
