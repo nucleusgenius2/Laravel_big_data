@@ -74,8 +74,6 @@
                 </select>
             </div>
 
-
-
             <div class="wrap-button-submit" style="margin-right:20px;">
                 <div class="button-blue-all button-admin"  style="margin-bottom: 10px;" @click="paginationListing('filter')" >
                     Применить фильтр
@@ -99,6 +97,7 @@
                     </div>
                 </div>
                 <div class="rating">Рейтинг: <span>{{ post.rating }}</span></div>
+                <div>дата публикации: {{ convertTime(post.created_at) }}</div>
                 <a :href="'/posts/'+post.id">Читать далее</a>
             </div>
 
@@ -120,6 +119,7 @@ import {authRequest} from "@/api.js";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import '@vuepic/vue-datepicker/dist/main.css'
 import Pagination from "v-pagination-3";
+import {convertTime} from "../script/convertTime.js";
 
 const route = useRoute();
 let arrayPosts = ref([]);
@@ -163,6 +163,7 @@ async function paginationListing(filterClick = '') {
         pageTotal.value = response.data.json['count'] ?? 1;
     }
     else{
+        pageTotal.value = response.data.json['count'] ?? 1;
         arrayPosts.value = []
         emptyPage.value = true;
     }

@@ -53,11 +53,11 @@ class PostController
             }
 
             $this->code = 200;
-
+            $this->json['count'] = floor(( $count->count ?? $count ) / 10 );
             if (count($postList) > 0) {
                 $this->status = 'success';
                 $this->json['data'] = $postList;
-                $this->json['count'] =  $count->count ?? $count;
+
             } else {
                 $this->text = 'Запрашиваемой страницы не существует';
             }

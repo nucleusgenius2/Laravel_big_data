@@ -43,16 +43,16 @@ trait Filter
             if (isset($this->dateFixed) && in_array($field, $this->dateFixed)) {
                 if ($value == 'day') {
                 //фильтр – данные за последний день
-                    $query = $query->whereDate('created_at', '>=', Carbon::yesterday());
+                    $query = $query->where('created_at', '>=', Carbon::yesterday());
                 } else if ($value == 'week') {
                 //фильтр – данные за последнюю неделю
-                    $query = $query->whereDate('created_at', '>=', now()->subDays(7));
+                    $query = $query->where('created_at', '>=', now()->subDays(7));
                 } else if ($value == 'month') {
                 //фильтр – данные за этот месяц (с 1 числа этого месяца)
-                    $query = $query->whereDate('created_at', '>=', Carbon::now()->startOfMonth());
+                    $query = $query->where('created_at', '>=', Carbon::now()->startOfMonth());
                 } else if ($value == 'year') {
                 //фильтр – данные за этот год
-                    $query = $query->whereDate('created_at', '>=', Carbon::now()->startOfYear());
+                    $query = $query->where('created_at', '>=', Carbon::now()->startOfYear());
                 }
             }
 
