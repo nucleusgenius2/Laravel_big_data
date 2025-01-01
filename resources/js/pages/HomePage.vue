@@ -48,6 +48,33 @@
                 </select>
             </div>
 
+            <div class="wrap-field">
+                <div class="heading-field text">Рейтинг</div>
+                <select class='field-admin' v-model="filter.rating">
+                    <option value="20">20</option>
+                    <option value="19">19</option>
+                    <option value="18">18</option>
+                    <option value="17">17</option>
+                    <option value="16">16</option>
+                    <option value="15">15</option>
+                    <option value="14">14</option>
+                    <option value="13">13</option>
+                    <option value="12">12</option>
+                    <option value="11">11</option>
+                    <option value="10">10</option>
+                    <option value="9">9</option>
+                    <option value="8">8</option>
+                    <option value="7">7</option>
+                    <option value="6">6</option>
+                    <option value="5">5</option>
+                    <option value="4">4</option>
+                    <option value="3">3</option>
+                    <option value="2">2</option>
+                    <option value="1">1</option>
+                </select>
+            </div>
+
+
 
             <div class="wrap-button-submit" style="margin-right:20px;">
                 <div class="button-blue-all button-admin"  style="margin-bottom: 10px;" @click="paginationListing('filter')" >
@@ -71,6 +98,7 @@
                         <div class="content-short-post">{{ post.short_description }}</div>
                     </div>
                 </div>
+                <div class="rating">Рейтинг: <span>{{ post.rating }}</span></div>
                 <a :href="'/posts/'+post.id">Читать далее</a>
             </div>
 
@@ -102,7 +130,8 @@ let filter = ref({
     'name' : '',
     'created_at_from' : '',
     'created_at_to' : '',
-    'date_fixed' : ''
+    'date_fixed' : '',
+    'rating' : '',
 });
 
 async function paginationListing(filterClick = '') {
@@ -122,14 +151,16 @@ async function paginationListing(filterClick = '') {
     if (filter.value.date_fixed!== '') {
         stringFilter += '&date_fixed=' + filter.value.date_fixed;
     }
-
+    if (filter.value.rating!== '') {
+        stringFilter += '&rating=' + filter.value.rating;
+    }
 
     let response = await authRequest('/api/posts?page=' + pageModel.value + stringFilter, 'get');
 
     if (response.data.status === 'success') {
         emptyPage.value = false;
-        arrayPosts.value = response.data.json;
-        pageTotal.value = response.data.json[1]['data_count'];
+        arrayPosts.value = response.data.json['data'];
+        pageTotal.value = response.data.json['count'] ?? 1;
     }
     else{
         arrayPosts.value = []
@@ -192,5 +223,7 @@ function clearFilter (){
 .heading-post {
     font-size: 20px;
 }
-
+.rating span {
+    font-weight:600
+}
 </style>

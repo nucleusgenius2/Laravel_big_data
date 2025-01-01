@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\DataCount;
 use App\Models\Post;
 use App\Traits\StructuredResponse;
 use Illuminate\Http\JsonResponse;
@@ -24,33 +25,39 @@ class PostController
             'created_at_to' => 'string|date',
             'name' => 'string|min:1|max:50',
             'date_fixed' => 'string|in:day,week,month,year',
+            'rating' => 'string|min:1|max:50',
         ]);
 
         if ($validated->fails()) {
             $this->text = $validated->errors();
         } else {
             $data = $validated->valid();
+            $offset = ($data['page'] - 1) * 10;
 
-            if ( isset($data['name']) || isset($data['created_at_to']) || isset($data['created_at_from']) || isset($data['date_fixed']) ){
+            if ( isset($data['name'])
+                || isset($data['created_at_to'])
+                || isset($data['created_at_from'])
+                || isset($data['date_fixed'])
+                || isset($data['rating'])
+            ){
                 $query = $post->filterCustom($data);
 
-                $postList = $query->orderBy('id', 'desc')->paginate(10, ['*'], 'page', $data['page']);
+               // $postList = $query->orderBy('id', 'desc')->paginate(10, ['*'], 'page', $data['page']);
+                $postList = $query->orderBy('id', 'desc')->skip($offset)->take(10)->get();
+                $count = $query->count();
+                log::info($count);
             }
             else{
-                $offset = ($data['page'] - 1) * 10;
-
-                $postList = Post::select([
-                    'posts.*',
-                    DB::raw('(SELECT count FROM data_counts WHERE type = "posts_counts" LIMIT 1) as data_count')
-                ])->orderBy('id', 'desc')->skip($offset)->take(10)->get();
-                log::info($postList);
+                $postList = Post::orderBy('id', 'desc')->skip($offset)->take(10)->get();
+                $count = DataCount::select('count')->where('type', 'posts_counts')->first();
             }
 
             $this->code = 200;
 
             if (count($postList) > 0) {
                 $this->status = 'success';
-                $this->json = $postList;
+                $this->json['data'] = $postList;
+                $this->json['count'] =  $count->count ?? $count;
             } else {
                 $this->text = 'Запрашиваемой страницы не существует';
             }
