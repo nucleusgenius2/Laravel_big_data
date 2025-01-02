@@ -41,11 +41,10 @@ class PostController
                 || isset($data['rating'])
             ){
                 $query = $post->filterCustom($data);
+                $queryForCount = clone $query;
+                $count = $queryForCount->count();
 
-               // $postList = $query->orderBy('id', 'desc')->paginate(10, ['*'], 'page', $data['page']);
                 $postList = $query->orderBy('id', 'desc')->skip($offset)->take(10)->get();
-                $count = $query->count();
-                log::info($count);
             }
             else{
                 $postList = Post::orderBy('id', 'desc')->skip($offset)->take(10)->get();

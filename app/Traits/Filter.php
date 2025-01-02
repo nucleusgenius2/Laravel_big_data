@@ -15,9 +15,9 @@ trait Filter
         foreach ($filters as $field => $value) {
             //поиск по фрагменту значения
             if (isset($this->whereSearch) && in_array($field, $this->whereSearch)) {
-                $query = $query->where($tableName . '.' . $field, 'LIKE', '%' . $value . '%');
+                //$query = $query->where($tableName . '.' . $field, 'LIKE', '%'.$value . '%');
+                $query = $query->whereRaw("MATCH(name) AGAINST(? IN BOOLEAN MODE)", ["*$value*"]);
             }
-
             //строгий поиск по точному совпадению
             if (isset($this->whereStrong) && in_array($field, $this->whereStrong)) {
                 $query = $query->where($tableName . '.' . $field, '=',  $value );

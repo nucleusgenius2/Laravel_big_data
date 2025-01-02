@@ -174,7 +174,8 @@ function clearFilter (){
     filter.value.name = '';
     filter.value.created_at_from = '';
     filter.value.created_at_to = '';
-    filter.value.chunk = '';
+    filter.value.date_fixed = '';
+    filter.value.rating = '';
     paginationListing();
 }
 </script>
