@@ -96,8 +96,9 @@
                         <div class="content-short-post">{{ post.short_description }}</div>
                     </div>
                 </div>
-                <div class="rating">Рейтинг: <span>{{ post.rating }}</span></div>
-                <div>дата публикации: {{ convertTime(post.created_at) }}</div>
+                <p>Рейтинг: <b>{{ post.rating }}</b></p>
+                <p><b>Дата публикации</b>: {{ convertTime(post.created_at) }}</p>
+                <p><b>Автор</b>: {{ post.author_name }}</p>
                 <a :href="'/posts/'+post.id">Читать далее</a>
             </div>
 

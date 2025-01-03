@@ -44,10 +44,14 @@ class PostController
                 $queryForCount = clone $query;
                 $count = $queryForCount->count();
 
-                $postList = $query->orderBy('created_at', 'desc')->skip($offset)->take(10)->get();
+                $postList = $query::join('users', 'posts.author_id', '=', 'users.id')
+                    ->select('posts.*', 'users.name as author_name')
+                    ->orderBy('created_at', 'desc')->skip($offset)->take(10)->get();
             }
             else{
-                $postList = Post::orderBy('id', 'desc')->skip($offset)->take(10)->get();
+                $postList = Post::join('users', 'posts.author_id', '=', 'users.id')
+                    ->select('posts.*', 'users.name as author_name')
+                    ->orderBy('id', 'desc')->skip($offset)->take(10)->get();
                 $count = DataCount::select('count')->where('type', 'posts_counts')->first();
             }
 
