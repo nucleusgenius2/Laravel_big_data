@@ -74,6 +74,16 @@
                 </select>
             </div>
 
+
+            <div class="wrap-field">
+                <div class="heading-field text">Поиск по авторам</div>
+
+                <span>Список авторов</span>
+                <select class='field-admin' v-model="filter.authors">
+                    <option v-for="(author, id) in arrayAuthors" :value="id" >{{ author}}</option>
+                </select>
+            </div>
+
             <div class="wrap-button-submit" style="margin-right:20px;">
                 <div class="button-blue-all button-admin"  style="margin-bottom: 10px;" @click="paginationListing('filter')" >
                     Применить фильтр
@@ -133,8 +143,9 @@ let filter = ref({
     'created_at_to' : '',
     'date_fixed' : '',
     'rating' : '',
+    'authors' : ''
 });
-
+let arrayAuthors = ref([])
 async function paginationListing(filterClick = '') {
     if (filterClick === 'filter') {
         pageModel.value = 1;
@@ -170,6 +181,14 @@ async function paginationListing(filterClick = '') {
     }
 }
 paginationListing();
+
+async function authors() {
+    let response = await authRequest('/api/authors?', 'get');
+    if (response.data.status === 'success') {
+        arrayAuthors.value = response.data.json.data
+    }
+}
+authors()
 
 function clearFilter (){
     filter.value.name = '';

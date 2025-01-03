@@ -16,8 +16,8 @@ class PostsTableSeeder extends Seeder
 
             $faker = Faker::create();
 
-            $batchSize = 1000; // Количество строк на один запрос вставки
-            $totalRows = 5000000; // Всего строк
+            $batchSize = 1000;
+            $totalRows = 5000000;
             $chunks = $totalRows / $batchSize;
 
             for ($i = 1; $i <= $chunks; $i++) {
