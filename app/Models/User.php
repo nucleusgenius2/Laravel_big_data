@@ -3,11 +3,6 @@
 namespace App\Models;
 
 
-use App\Jobs\SendMail;
-use App\Models\UserBalance;
-use App\Notifications\EmailVerificationNotification;
-use App\Notifications\ResetPassword;
-use App\Notifications\VerifyEmailQueued;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;

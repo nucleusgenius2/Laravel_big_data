@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('authors', function (Blueprint $table) {
 			$table->Integer('user_id');
-			$table->Integer('post_id');
         });
 
     }

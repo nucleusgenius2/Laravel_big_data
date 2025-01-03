@@ -80,7 +80,7 @@
 
                 <span>Список авторов</span>
                 <select class='field-admin' v-model="filter.authors">
-                    <option v-for="(author, id) in arrayAuthors" :value="id" >{{ author}}</option>
+                    <option v-for="(author) in arrayAuthors" :value="author.user_id">{{ author.name}}</option>
                 </select>
             </div>
 
@@ -111,7 +111,6 @@
                 <p><b>Автор</b>: {{ post.author_name }}</p>
                 <a :href="'/posts/'+post.id">Читать далее</a>
             </div>
-
         </div>
 
         <pagination v-model="pageModel" :records="pageTotal" :per-page="1" @paginate="paginationListing"/>
@@ -137,6 +136,7 @@ let arrayPosts = ref([]);
 let emptyPage = ref(false);
 let pageModel = ref(1)
 let pageTotal = ref(1)
+let pageAuthorTotal = ref(1)
 let filter = ref({
     'name' : '',
     'created_at_from' : '',
@@ -183,7 +183,7 @@ async function paginationListing(filterClick = '') {
 paginationListing();
 
 async function authors() {
-    let response = await authRequest('/api/authors?', 'get');
+    let response = await authRequest('/api/authors?page='+pageAuthorTotal.value, 'get');
     if (response.data.status === 'success') {
         arrayAuthors.value = response.data.json.data
     }

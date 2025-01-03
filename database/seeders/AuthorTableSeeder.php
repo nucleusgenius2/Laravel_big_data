@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Author;
-use App\Models\Post;
+use App\Models\DataCount;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -17,28 +17,40 @@ class AuthorTableSeeder extends Seeder
 
     public function run()
     {
-        $author = DB::table('authors')->exists();
-
+        $author = Author::exists();
         if (!$author) {
-            $authors = [];
-
-            for ($postId = 1; $postId <= 5000000; $postId++) {
-                $authors[] = [
-                    'user_id' => ($postId % 10) + 1,
-                    'post_id' => $postId,
-                ];
-
-                // Вставляем порциями по 10,000 записей для оптимизации
-                if ($postId % 10000 === 0) {
-                    DB::table('authors')->insert($authors);
-                    $authors = [];
-                }
-            }
-
-            // Вставляем оставшиеся записи, если они есть
-            if (!empty($authors)) {
-                DB::table('authors')->insert($authors);
-            }
+            Author::insert([
+                [
+                    'user_id' => '1',
+                ],
+                [
+                    'user_id' => '2',
+                ],
+                [
+                    'user_id' => '3',
+                ],
+                [
+                    'user_id' => '4',
+                ],
+                [
+                    'user_id' => '5',
+                ],
+                [
+                    'user_id' => '6',
+                ],
+                [
+                    'user_id' => '7',
+                ],
+                [
+                    'user_id' => '8',
+                ],
+                [
+                    'user_id' => '9',
+                ],
+                [
+                    'user_id' => '10',
+                ],
+            ]);
         }
     }
 }

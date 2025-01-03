@@ -12,11 +12,16 @@ class DataCountsTableSeeder extends Seeder
     {
        $postCount = DataCount::where('type', 'posts_counts')->first();
        if (!$postCount){
-           DataCount::create([
-               'type' => 'posts_counts',
-               'count' => 5000000
-              ]
-           );
+           DataCount::insert([
+               [
+                   'type' => 'posts_counts',
+                   'count' => 5000000
+               ],
+               [
+                   'type' => 'authors_counts',
+                   'count' => 10
+               ]
+           ]);
        }
     }
 
