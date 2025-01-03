@@ -44,9 +44,7 @@ class PostController
                 $queryForCount = clone $query;
                 $count = $queryForCount->count();
 
-                //$postList = $query->orderBy('id', 'desc')->skip($offset)->take(10)->get();
                 $postList = $query->orderBy('created_at', 'desc')->skip($offset)->take(10)->get();
-                //$postList = $query->skip($offset)->take(10)->get();
             }
             else{
                 $postList = Post::orderBy('id', 'desc')->skip($offset)->take(10)->get();
