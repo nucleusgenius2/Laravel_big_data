@@ -26,6 +26,7 @@ class PostController
             'name' => 'string|min:1|max:50',
             'date_fixed' => 'string|in:day,week,month,year',
             'rating' => 'string|min:1|max:50',
+            'authors' => 'integer',
         ]);
 
         if ($validated->fails()) {
@@ -39,14 +40,24 @@ class PostController
                 || isset($data['created_at_from'])
                 || isset($data['date_fixed'])
                 || isset($data['rating'])
+                || isset($data['authors'])
             ){
                 $query = $post->filterCustom($data);
+
+                if (isset($data['authors']) ){
+                    $query = $query->where('posts.author_id', $data['authors']); //условие по автору
+                }
+
                 $queryForCount = clone $query;
                 $count = $queryForCount->count();
 
-                $postList = $query::join('users', 'posts.author_id', '=', 'users.id')
+                $postList = $query->join('users', 'posts.author_id', '=', 'users.id')
                     ->select('posts.*', 'users.name as author_name')
-                    ->orderBy('created_at', 'desc')->skip($offset)->take(10)->get();
+                    ->orderBy('posts.created_at', 'desc')
+                    ->skip($offset)
+                    ->take(10)
+                    ->get();
+
             }
             else{
                 $postList = Post::join('users', 'posts.author_id', '=', 'users.id')
