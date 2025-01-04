@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 trait Filter
@@ -16,7 +17,8 @@ trait Filter
             //поиск по фрагменту значения
             if (isset($this->whereSearch) && in_array($field, $this->whereSearch)) {
                 //$query = $query->where($tableName . '.' . $field, 'LIKE', '%'.$value . '%');
-                $query = $query->whereRaw("MATCH(name) AGAINST(? IN BOOLEAN MODE)", ["*$value*"]);
+                $query = $query->whereRaw("MATCH({$tableName}.{$field}) AGAINST(? IN BOOLEAN MODE)", ["*$value*"]);
+
             }
             //строгий поиск по точному совпадению
             if (isset($this->whereStrong) && in_array($field, $this->whereStrong)) {
