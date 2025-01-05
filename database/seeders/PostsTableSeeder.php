@@ -32,7 +32,6 @@ class PostsTableSeeder extends Seeder
                         'full_description' => $faker->text(500),
                         'category_id' => random_int(1, 10),
                         'author_id' => random_int(1, 10),
-                        'views' => random_int(0, 100000),
                         'rating' => random_int(1, 20),
                         'created_at' => $faker->dateTimeBetween('-1 year', 'now'),
                     ];
