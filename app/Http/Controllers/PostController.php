@@ -54,8 +54,9 @@ class PostController
 
                 $queryForCount = clone $query;
                 $count = $queryForCount
+                    ->select('id')
                     ->take($this->paginationLimit)
-                    ->skip($offsetPagination)
+                    ->skip($offset )
                     ->get()
                     ->count();
 
@@ -76,7 +77,10 @@ class PostController
             else{
                 $postList = Post::join('users', 'posts.author_id', '=', 'users.id')
                     ->select('posts.*', 'users.name as author_name')
-                    ->orderBy('id', 'desc')->skip($offset)->take($this->perPageFrontend)->get();
+                    ->orderBy('id', 'desc')
+                    ->skip($offset)
+                    ->take($this->perPageFrontend)
+                    ->get();
                 $count = DataCount::select('count')->where('type', 'posts_counts')->first();
             }
 
