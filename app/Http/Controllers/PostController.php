@@ -56,7 +56,7 @@ class PostController
                 $count = $queryForCount
                     ->select('id')
                     ->take($this->paginationLimit)
-                    ->skip($offset )
+                    ->skip($offsetPagination)
                     ->get()
                     ->count();
 

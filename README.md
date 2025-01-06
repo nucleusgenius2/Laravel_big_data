@@ -36,3 +36,4 @@
 - B-TREE: CREATE INDEX idx_rating ON posts (rating);
 - B-TREE: CREATE INDEX idx_created_at ON posts (created_at)
 - B-TREE: CREATE INDEX idx_rating_created_at_desc ON posts(rating, created_at DESC);
+- B-TREE: CREATE INDEX idx_author_id_rating_created_at ON posts (author_id, rating, created_at DESC);
