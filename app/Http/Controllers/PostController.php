@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PostSearchRequest;
 use App\Models\DataCount;
 use App\Models\Post;
+use App\Services\PostService;
 use App\Traits\StructuredResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
@@ -20,81 +22,27 @@ class PostController
     public int $perPageFrontend = 10;
     public int $paginationLimit = 200;
 
-    public function index(Request $request, Post $post): JsonResponse
+    protected PostService $service;
+
+    public function __construct(PostService $service)
     {
-        $validated = Validator::make($request->all(), [
-            'page' => 'required|integer|min:1',
-            'created_at_from' => 'string|date',
-            'created_at_to' => 'string|date',
-            'name' => 'string|min:1|max:50',
-            'date_fixed' => 'string|in:day,week,month,year',
-            'rating' => 'string|min:1|max:50',
-            'authors' => 'integer',
-        ]);
+        $this->service = $service;
+    }
 
-        if ($validated->fails()) {
-            $this->text = $validated->errors();
-        } else {
-            $data = $validated->valid();
-            $offset = ($data['page'] - 1) * $this->perPageFrontend;
-            $offsetPagination = ($data['page'] - 1) * $this->paginationLimit;
+    public function index(PostSearchRequest $request, Post $post): JsonResponse
+    {
+        $data = $request->validated();
 
-            if ( isset($data['name'])
-                || isset($data['created_at_to'])
-                || isset($data['created_at_from'])
-                || isset($data['date_fixed'])
-                || isset($data['rating'])
-                || isset($data['authors'])
-            ){
-                $query = $post->filterCustom($data);
+        $dataObjectDTO = $this->service->getPosts(
+            data: $data,
+            modelPost: $post,
+            perPage: $this->perPageFrontend,
+            paginationLimit: $this->paginationLimit
+        );
 
-                if (isset($data['authors']) ){
-                    $query = $query->where('posts.author_id', $data['authors']); //условие по автору
-                }
-
-                $queryForCount = clone $query;
-                $count = $queryForCount
-                    ->select('id')
-                    ->take($this->paginationLimit)
-                    ->skip($offsetPagination)
-                    ->get()
-                    ->count();
-
-                $query = $query
-                    ->join('users', 'posts.author_id', '=', 'users.id')
-                    ->select('posts.*', 'users.name as author_name');
-
-                //сортировка слишком дорогая при поиске
-                if(!isset($data['name']) ){
-                    $query = $query->orderBy('posts.created_at', 'desc');
-                };
-
-                $postList = $query
-                    ->skip($offset)
-                    ->take($this->perPageFrontend)
-                    ->get();
-            }
-            else{
-                $postList = Post::join('users', 'posts.author_id', '=', 'users.id')
-                    ->select('posts.*', 'users.name as author_name')
-                    ->orderBy('id', 'desc')
-                    ->skip($offset)
-                    ->take($this->perPageFrontend)
-                    ->get();
-                $count = DataCount::select('count')->where('type', 'posts_counts')->first();
-            }
-
-            $this->code = 200;
-            $this->json['count'] = floor(( $count->count ?? $count ) / $this->perPageFrontend);
-
-            if (count($postList) > 0) {
-                $this->status = 'success';
-                $this->json['data'] = $postList;
-
-            } else {
-                $this->text = 'Запрашиваемой страницы не существует';
-            }
-        }
+        $this->status = 'success';
+        $this->code = 200;
+        $this->json = $dataObjectDTO->data;
 
         return $this->responseJsonApi();
     }
