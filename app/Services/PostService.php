@@ -33,11 +33,21 @@ class PostService
             //получаем id нужных строк из индекса
             $idsRow = $queryForIds->select('id');
             //сортировка слишком дорогая при поиске
-            if(!isset($data['name']) ){
-                log::info('добавили id к запросу');
-                $idsRow = $idsRow->orderBy('posts.created_at', 'desc');
-            };
-            $idsRow = $idsRow->orderBy('posts.created_at', 'desc')
+            log::info('1111');
+            if(isset($data['name1']) ){
+                $search = $data['name'];
+                $idsSearch = $modelPost::select('id')
+                    ->whereRaw("MATCH(posts.name) AGAINST(? IN BOOLEAN MODE)", ["*$search*"])
+                    ->skip($offset)
+                    ->take($perPage) //острожно, без лимита падает база при поиске
+                    ->pluck('id');
+                log::info( $idsSearch);
+            }
+            if (isset($idsSearch) && $idsSearch->isNotEmpty()) {
+                $idsRow = $idsRow->whereIn('id', $idsSearch);
+            }
+            $idsRow = $idsRow
+                ->orderBy('posts.created_at', 'desc')
                 ->skip($offset)
                 ->take($perPage)
                 ->pluck('id');

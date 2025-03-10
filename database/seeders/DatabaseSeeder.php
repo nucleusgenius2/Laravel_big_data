@@ -19,6 +19,8 @@ class DatabaseSeeder extends Seeder
         $this->call(DataCountsTableSeeder::class);
         $this->call(UserTableSeeder::class);
         $this->call(AuthorTableSeeder::class);
+        $this->call(RuPostTableSeeder::class);
+
 
     }
 }
