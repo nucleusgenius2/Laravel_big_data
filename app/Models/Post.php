@@ -23,6 +23,7 @@ class Post extends Model
         'author',
     ];
 
+    public $timestamps = false;
 
     protected array $whereStrong = ['rating'];
     protected array $whereSearch = ['name'];
