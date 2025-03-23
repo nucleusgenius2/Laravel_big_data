@@ -39,25 +39,8 @@ class RuPostTableSeeder extends Seeder
                 ]
             ];
 
-            // Вставляем посты в базу данных
+
             Post::insert($posts);
-
-            // Получаем все вставленные посты (поскольку они только что были добавлены, мы можем получить их ID)
-            $insertedPosts = Post::whereIn('name', array_column($posts, 'name'))->get();
-
-            // Индексация данных в Elasticsearch
-            foreach ($insertedPosts as $post) {
-                // Отправляем пост в Elasticsearch, используя ID из базы данных
-                Http::post('http://localhost:9200/posts/_doc/' . $post->id, [
-                    'name' => $post->name,
-                    'short_description' => $post->short_description,
-                    'full_description' => $post->full_description,
-                    'category_id' => $post->category_id,
-                    'author_id' => $post->author_id,
-                    'rating' => $post->rating,
-                    'created_at' => $post->created_at->format('Y-m-d H:i:s'), // Преобразуем дату в строку
-                ]);
-            }
         }
     }
 

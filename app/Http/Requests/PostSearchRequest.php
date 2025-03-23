@@ -29,7 +29,7 @@ class PostSearchRequest extends FormRequest
             'name' => 'string|min:1|max:50',
             'date_fixed' => 'string|in:day,week,month,year',
             'rating' => 'string|min:1|max:50',
-            'authors' => 'integer',
+            'author_id' => 'integer',
         ];
 
     }

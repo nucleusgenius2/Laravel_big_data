@@ -167,7 +167,7 @@ async function paginationListing(filterClick = '') {
         stringFilter += '&rating=' + filter.value.rating;
     }
     if (filter.value.authors!== '') {
-        stringFilter += '&authors=' + filter.value.authors;
+        stringFilter += '&author_id=' + filter.value.authors;
     }
 
     let response = await authRequest('/api/posts?page=' + pageModel.value + stringFilter, 'get');

@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
-use App\Traits\Filter;
+
+use App\Traits\FilterHandler;
 use Illuminate\Database\Eloquent\Model;
 
 class Post extends Model
 {
-    use Filter;
+    use FilterHandler;
 
     /**
      * @var string[]
@@ -25,10 +26,9 @@ class Post extends Model
 
     public $timestamps = false;
 
-    protected array $whereStrong = ['rating'];
+    protected array $whereStrong = ['rating', 'author_id'];
     protected array $whereSearch = ['name'];
     protected array $intervalSearch = ['created_at_from', 'created_at_to'];
     protected array $dateFixed = ['date_fixed'];
-
-
+    //protected array $whereIn = ['author_id'];
 }
