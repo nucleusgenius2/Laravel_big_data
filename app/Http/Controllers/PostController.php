@@ -16,7 +16,6 @@ class PostController
     use StructuredResponse;
 
     public int $perPageFrontend = 10;
-    public int $paginationLimit = 200;
 
     protected PostService $service;
 
@@ -25,6 +24,12 @@ class PostController
         $this->service = $service;
     }
 
+    /**
+     * Пагинированный список новостей
+     * @param PostSearchRequest $request
+     * @param Post $post
+     * @return JsonResponse
+     */
     public function index(PostSearchRequest $request, Post $post): JsonResponse
     {
         $data = $request->validated();
@@ -33,7 +38,6 @@ class PostController
             data: $data,
             modelPost: $post,
             perPage: $this->perPageFrontend,
-            paginationLimit: $this->paginationLimit
         );
 
         $this->status = 'success';
@@ -44,27 +48,23 @@ class PostController
     }
 
 
+    /**
+     * Возвращает конкретную новость
+     * @param int $id
+     * @return JsonResponse
+     */
     public function show(int $id): JsonResponse
     {
-        $validated = Validator::make(['id' => $id], [
-            'id' => 'required|integer|min:1',
-        ]);
+        if ($id > 0) {
+            $dataObjectDTO = $this->service->getPost(id: $id);
 
-        if ($validated->fails()) {
-            $this->text = $validated->errors();
-        } else {
-            $data = $validated->valid();
-
-            $contentPostSingle = Cache::rememberForever('post_id_'.$data['id'], function () use ($data) {
-                return Post::where('id', '=', $data['id'])->get();
-            });
-
-            if (count($contentPostSingle) > 0) {
+            if ($dataObjectDTO->status) {
                 $this->status = 'success';
                 $this->code = 200;
-                $this->json = $contentPostSingle;
+                $this->json  = $dataObjectDTO->data;
             } else {
-                $this->text = 'Запрашиваемой новости не существует';
+                $this->text = $dataObjectDTO->error;
+                $this->code = $dataObjectDTO->code;
             }
         }
 

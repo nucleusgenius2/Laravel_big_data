@@ -3,22 +3,22 @@
 namespace App\Services;
 
 use App\DTO\DataArrayDTO;
+use App\DTO\DataObjectDTO;
 use App\Models\DataCount;
 use App\Models\Post;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class PostService
 {
-    public function getPosts(array $data, Post $modelPost, int $perPage, int $paginationLimit): DataArrayDTO
+    public function getPosts(array $data, Post $modelPost, int $perPage): DataArrayDTO
     {
         $offset = ($data['page'] - 1) * $perPage;
-        $offsetPagination = ($data['page'] - 1) * $paginationLimit;
-
         //если в запросе есть поиск ищем через эластик серч
         if (isset($data['name'])) {
 
-            $query = $modelPost->filterElasticBuilder(filters: $data, page: $data['page'], perPage: $perPage);
+            $query = $modelPost->filterElasticSuggesterBuilder(filters: $data, page: $data['page'], perPage: $perPage);
 
             log::info(json_encode($query));
             $response = Http::withHeaders([
@@ -46,9 +46,6 @@ class PostService
                 ->orderByRaw("FIELD(posts.id, " . implode(',', $idsRow->toArray()) . ")")
                 ->get();
 
-            log::info('массив');
-            log::info($idsRow);
-            log::info( $postList);
         }
         //ветка поиска через реляционную базу
         else {
@@ -63,9 +60,6 @@ class PostService
             {
                 $query = $modelPost->filterOrmBuilder(filters: $data);
 
-               // if (isset($data['authors'])) {
-                    //$query = $query->where('posts.author_id', $data['authors']);
-                //}
 
                 $queryForCount = clone $query;
                 $queryForIds = clone $query;
@@ -85,9 +79,10 @@ class PostService
 
                 //получаем общее количество записей удовлетворяющих условию фильтра, за вычетом пагинации
                 $count = $queryForCount
+
                     ->select('id')
-                    ->take($paginationLimit)
-                    ->skip($offsetPagination)
+                    ->take($offset)
+                    ->skip($perPage)
                     ->get()
                     ->count();
 
@@ -108,8 +103,6 @@ class PostService
 
                 $count = DataCount::select('count')->where('type', 'posts_counts')->first();
             }
-
-
         }
 
         $returnData = [
@@ -118,5 +111,19 @@ class PostService
         ];
 
         return new DataArrayDTO(status: true, data: $returnData);
+    }
+
+
+    public function getPost(int $id): DataObjectDTO
+    {
+        $postSingle = Cache::rememberForever('post_id_' . $id, function () use ($id) {
+            return Post::where('id', '=', $id)->get();
+        });
+
+        if ($postSingle) {
+            return new DataObjectDTO(status: true, data: $postSingle);
+        } else {
+            return new DataObjectDTO(status: false, error: 'Новости не существует', code: 404);
+        }
     }
 }
