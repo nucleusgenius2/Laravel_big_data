@@ -36,7 +36,7 @@ class PostController
 
         $dataObjectDTO = $this->service->getPosts(
             data: $data,
-            modelPost: $post,
+            model: $post,
             perPage: $this->perPageFrontend,
         );
 

@@ -61,7 +61,7 @@ class IndexPostsToElasticsearch extends Command
                     $bulkData = ''; // Сбрасываем буфер
                 }
 
-                usleep(80000); // Ожидание перед следующей пачкой
+                usleep(80000);
             });
 
         $this->info("Индексирование завершено.");
@@ -69,8 +69,10 @@ class IndexPostsToElasticsearch extends Command
 
     private function sendToElasticsearch($bulkData)
     {
+
+
         $response = Http::withBody($bulkData, 'application/x-ndjson')
-            ->post('http://localhost:9200/_bulk');
+            ->post(config('elasticsearch.elastic_search_url').'/_bulk');
 
         if ($response->successful()) {
             Log::info("Bulk-запрос выполнен успешно.");

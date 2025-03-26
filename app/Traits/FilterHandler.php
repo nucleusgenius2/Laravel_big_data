@@ -195,6 +195,7 @@ trait FilterHandler
     public function filterElasticSuggesterBuilder(array $filters = [], int $page = 1, int $perPage = 10, bool $fixeTime = false): array
     {
         $query = ["bool" => ["should" => []]];
+
         foreach ($filters as $field => $value) {
             // Поиск по тексту (целое слово и фрагменты)
             if (isset($this->whereSearch) && in_array($field, $this->whereSearch)) {
@@ -219,7 +220,6 @@ trait FilterHandler
 
             // Точное соответствие
             if (isset($this->whereStrong) && in_array($field, $this->whereStrong)) {
-                log::info('принято ' . $field);
                 $query["bool"]["must"][] = [
                     "term" => [$field => $value]
                 ];

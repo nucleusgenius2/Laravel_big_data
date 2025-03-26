@@ -12,35 +12,35 @@ use Illuminate\Support\Facades\Log;
 
 class PostService
 {
-    public function getPosts(array $data, Post $modelPost, int $perPage): DataArrayDTO
+    public function getPosts(array $data, Post $model, int $perPage): DataArrayDTO
     {
         $offset = ($data['page'] - 1) * $perPage;
+
+        $paginationLimit = 200;
+
         //если в запросе есть поиск ищем через эластик серч
         if (isset($data['name'])) {
 
-            $query = $modelPost->filterElasticSuggesterBuilder(filters: $data, page: $data['page'], perPage: $perPage);
+            $query = $model->filterElasticSuggesterBuilder(filters: $data, page: $data['page'], perPage: $perPage);
 
-            log::info(json_encode($query));
+
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
-            ])->post('http://localhost:9200/posts/_search', $query);
+            ])->post(config('elasticsearch.elastic_search_url').'/posts/_search', $query);
 
-            // Получаем JSON-ответ
             $data = $response->json();
-            log::info($data );
 
-            // Извлекаем общее количество найденных записей
+            //получаем общее количество записей удовлетворяющих условию фильтра, за вычетом пагинации
             $count = $data['hits']['total']['value'] ?? 0;
-            log::info('$count'.$count);
 
-            // Извлекаем все ID постов в массив
+            //получаем id нужных строк из индекса
             $idsRow = collect($data['hits']['hits'])->pluck('_source.id');
 
             if ($idsRow->isEmpty()) {
                 return new DataArrayDTO(status: true, data: []);
             }
 
-            $postList = $modelPost->whereIn('posts.id', $idsRow)
+            $postList = $model->whereIn('posts.id', $idsRow)
                 ->join('users', 'posts.author_id', '=', 'users.id')
                 ->select('posts.*', 'users.name as author_name')
                 ->orderByRaw("FIELD(posts.id, " . implode(',', $idsRow->toArray()) . ")")
@@ -55,11 +55,10 @@ class PostService
                 || isset($data['created_at_from'])
                 || isset($data['date_fixed'])
                 || isset($data['rating'])
-                || isset($data['authors'])
+                || isset($data['author_id'])
             )
             {
-                $query = $modelPost->filterOrmBuilder(filters: $data);
-
+                $query = $model->filterOrmBuilder(filters: $data);
 
                 $queryForCount = clone $query;
                 $queryForIds = clone $query;
@@ -76,17 +75,15 @@ class PostService
                     return new DataArrayDTO(status: true, data: []);
                 }
 
-
                 //получаем общее количество записей удовлетворяющих условию фильтра, за вычетом пагинации
                 $count = $queryForCount
-
                     ->select('id')
-                    ->take($offset)
-                    ->skip($perPage)
+                    ->skip($offset)
+                    ->take($paginationLimit) //узкое место count по всему результату, искусственный лимит, не заметный для юзера
                     ->get()
                     ->count();
 
-                $postList = $modelPost->whereIn('posts.id', $idsRow)
+                $postList = $model->whereIn('posts.id', $idsRow)
                     ->join('users', 'posts.author_id', '=', 'users.id')
                     ->select('posts.*', 'users.name as author_name')
                     ->orderByRaw("FIELD(posts.id, " . implode(',', $idsRow->toArray()) . ")")
